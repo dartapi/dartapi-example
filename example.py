@@ -26,7 +26,7 @@ class ExampleDartApi(DartApiBase):
 		for report in list_report_date:
 			print(report)
 
-	def test_get_get_fact(self):
+	def test_get_fact(self):
 		list_fact = self.get_fact("000020", "201809")
 		for fact in list_fact:
 			print(fact)
@@ -39,4 +39,4 @@ if __name__ == "__main__":
 		runner.test_get_all_company()
 		runner.test_get_report_by_stock_code()
 		runner.test_get_report_by_date()
-		runner.test_get_get_fact()
+		runner.test_get_fact()
