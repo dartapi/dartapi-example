@@ -5,8 +5,11 @@ from config import Config
 
 class DartApiBase(object):
 	token = None
-	DARTAPI_URI_AUTHENTICATE = "/wp-json/aam/v1/authenticate"
-	DARTAPI_URI_COMPANY = "/wp-json/api/company/{}"
+	DARTAPI_URI_AUTHENTICATE = "/aam/v1/authenticate"
+	DARTAPI_URI_REPORT = "/api/report/{}"
+	DARTAPI_URI_REPORT_DATE = "/api/report/date/{}"
+	DARTAPI_URI_COMPANY = "/api/company/{}"
+	DARTAPI_URI_FACT = "/api/fact/{}/{}"
 
 	MAX_RETRY = 5
 	retry_counter = 0
@@ -20,12 +23,29 @@ class DartApiBase(object):
 	def __exit__(self, type_unused, value_unused, traceback_unused):
 		pass
 
+	# 개별 기업의 사업/분기/반기 보고서 정보를 리턴합니다.
+	def get_report_by_stock_code(self, stock_code):
+		url = self.config.get_env_value("DARTAPI_HOST") + self.DARTAPI_URI_REPORT.format(stock_code)
+		return self.get_content(url)
+
+	# 해당 날짜의 사업/분기/반기 보고서 정보를 리턴합니다.
+	def get_report_by_date(self, date="20190102"):
+		url = self.config.get_env_value("DARTAPI_HOST") + self.DARTAPI_URI_REPORT_DATE.format(date)
+		return self.get_content(url)
+
+	# 개별 기업 정보를 리턴합니다.
 	def get_company(self, stock_code):
 		url = self.config.get_env_value("DARTAPI_HOST") + self.DARTAPI_URI_COMPANY.format(stock_code)
 		return self.get_content(url)
 
+	# 모든 기업의 정보를 리턴합니다.
 	def get_all_company(self):
 		url = self.config.get_env_value("DARTAPI_HOST") + self.DARTAPI_URI_COMPANY.format("")
+		return self.get_content(url)
+
+	# 기업의 분기별 재무정보를 리턴합니다.
+	def get_fact(self, stock_code, quarter):
+		url = self.config.get_env_value("DARTAPI_HOST") + self.DARTAPI_URI_FACT.format(stock_code, quarter)
 		return self.get_content(url)
 
 	def get_token(self):
@@ -78,6 +98,10 @@ class DartApiBase(object):
 	def content_with_json(response):
 		if response and response.status_code == 200:
 			return response.json()
+		elif response and response.status_code == 401:
+			print("401 UNAUTHORIZED", "인증 정보를 확인해주세요.")
+		elif response and response.status_code == 403:
+			print("403 FORBIDDEN", "인증 정보를 확인해주세요.")
 		else:
 			print("response else", response)
 			if hasattr(response, "content"):
@@ -90,7 +114,17 @@ if __name__ == "__main__":
 	with DartApiBase(config) as runner:
 		company = runner.get_company("000020")
 		print(company)
-		company = runner.get_all_company()
-		for c in company:
-			company = runner.get_company(c["stock_code"])
+		list_company = runner.get_all_company()
+		for company in list_company:
 			print(company)
+
+		list_report_company = runner.get_report_by_stock_code("000020")
+		for report in list_report_company:
+			print(report)
+		list_report_date = runner.get_report_by_date("20181114")
+		for report in list_report_date:
+			print(report)
+
+		list_fact = runner.get_fact("000020", "201809")
+		for fact in list_fact:
+			print(fact)
