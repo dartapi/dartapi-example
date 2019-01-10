@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 from config import Config
@@ -55,7 +57,7 @@ class DartApiBase(object):
 			"username": self.config.get_env_value("DARTAPI_USER"),
 			"password": self.config.get_env_value("DARTAPI_USER_PASSWORD")
 		}
-		headers = {"Cache-Control": "no-cache"}
+		headers = {"Cache-Control": "no-cache", "Content-Type": "application/json"}
 		content = self.get_content(self.get_token_url(), headers, data=data)
 		self.token = content["token"]
 		return self.token
@@ -80,7 +82,7 @@ class DartApiBase(object):
 
 		try:
 			if data:
-				response = requests.post(url, data=data, headers=headers, timeout=120, stream=False, verify=False)
+				response = requests.post(url, data=json.dumps(data), headers=headers, timeout=120, stream=False, verify=False)
 			else:
 				response = requests.get(url, headers=headers, timeout=120, stream=False, verify=False)
 		except Exception as error:
