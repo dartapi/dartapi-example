@@ -7,11 +7,11 @@ from config import Config
 
 class DartApiBase(object):
 	token = None
-	DARTAPI_URI_AUTHENTICATE = "/aam/v1/authenticate"
-	DARTAPI_URI_REPORT = "/api/report/{}"
-	DARTAPI_URI_REPORT_DATE = "/api/report/date/{}"
-	DARTAPI_URI_COMPANY = "/api/company/{}"
-	DARTAPI_URI_FACT = "/api/fact/{}/{}"
+	DARTAPI_URI_AUTHENTICATE = "/wp-json/aam/v1/authenticate"
+	DARTAPI_URI_REPORT = "/wp-json/api/report/{}"
+	DARTAPI_URI_REPORT_DATE = "/wp-json/api/report/date/{}"
+	DARTAPI_URI_COMPANY = "/wp-json/api/company/{}"
+	DARTAPI_URI_FACT = "/wp-json/api/fact/{}/{}"
 
 	MAX_RETRY = 5
 	retry_counter = 0
